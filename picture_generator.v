@@ -17,16 +17,36 @@ VGA_sync sync_gen(.clk(clk), .vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync),
 						.in_display_area(in_display_area));
 			
 
-reg [18:0] x ;	
+reg [18:0] x;
+reg [18:0] y;	
+reg was_next_lined;
 	
 ////Coordinates generator
 always@(posedge clk)
 begin
   
-  if (in_display_area==1'b1)
+   if (in_display_area==1'b1)
+   begin
      x<=x+1;
-	  else
-	    x<=19'd0;
+	  was_next_lined <= 0;
+	end
+	else
+	   begin 
+			if(y < VIDEO_H && !was_next_lined)
+				begin
+				y <= y + 1; 
+				was_next_lined <= 1;
+				end
+			else 
+			begin
+				if(!was_next_lined)
+					begin
+					y <= 19'd0;
+					was_next_lined <= 1;
+					end
+			x<=19'd0;
+			end
+		end
 end	
 		
 reg [11:0] rgb_data;
@@ -38,11 +58,11 @@ always@(posedge clk)
 begin
 //rgb_data <= {4'hf, 4'h0, 4'h0};
     begin
-      if (0<x && x <= VIDEO_W/3)
+      if (y > 0 && y <= VIDEO_H/3 && 0<x && x <= VIDEO_W)
 					rgb_data <= {4'h0, 4'h0, 4'hf}; 
-				else if (x > VIDEO_W/3 && x <= VIDEO_W*2/3)
+				else if (y > VIDEO_H/3 && y <= VIDEO_H*2/3 && 0<x && x <= VIDEO_W )
 					rgb_data <= {4'hf,4'hf, 4'hf};  
-				else if(x > VIDEO_W*2/3 && x <=VIDEO_W)
+				else if(y > VIDEO_H*2/3 && y <=VIDEO_H && 0<x && x <= VIDEO_W)
 					rgb_data <= {4'hf, 4'h0, 4'h0}; 
 				else rgb_data <= 12'h000; 
  
