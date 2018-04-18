@@ -18,8 +18,6 @@ wire in_display_area;
 wire [9:0] x;
 wire [9:0] y;
 
-integer index;
-
 VGA_sync sync_gen(.clk(clk), .vga_h_sync(vga_h_sync), .vga_v_sync(vga_v_sync), 
 						.in_display_area(in_display_area), .x(x), .y(y));
 				
@@ -48,12 +46,8 @@ assign font_bit = font_word[~bit_addr];
 
 always@(*)
 begin
-if(x == 0 || index >= maxInput)
-	index = 0;
-else if(x % 8 == 0)
-	index = index + 4;
-	
-case(numbers[index +: 3])
+if(x < maxInput * 2)
+case(numbers[(x/8)*4 +:4])
 
 	4'h0: char_addr <= 6'h30;
 	4'h1: char_addr <= 6'h31;
@@ -65,12 +59,13 @@ case(numbers[index +: 3])
 	4'h7: char_addr <= 6'h37;
 	4'h8: char_addr <= 6'h38;
 	4'h9: char_addr <= 6'h39;
-	
 endcase
+
+else char_addr <= 6'h00;
 
 end
 
-assign text_bit_on =  (x[9:7] == 0 && y[9:4] == 0)? font_bit : 1'b0;
+assign text_bit_on =  (y[9:4] == 0)? font_bit : 1'b0;
 
  // rgb multiplexing circuit
  always@(*)
