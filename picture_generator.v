@@ -1,7 +1,7 @@
 //http://www.fpga4fun.com/PongGame.html
 
 module picture_generator
-#(parameter maxInput = 16,
+#(parameter maxInput = 384,
   parameter VIDEO_W	= 640,
   parameter VIDEO_H	= 480)
 (clk, numbers, vga_h_sync, vga_v_sync, vga_R, vga_G, vga_B);
@@ -46,8 +46,8 @@ assign font_bit = font_word[~bit_addr];
 
 always@(*)
 begin
-if(x + 1 < maxInput * 2)
-case(numbers[((x+1)/8)*4 +:4])
+if((y/16)*640 + x < maxInput * 2)
+case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
 
 	4'h0: char_addr <= 6'h30;
 	4'h1: char_addr <= 6'h31;
@@ -65,7 +65,7 @@ else char_addr <= 6'h00;
 
 end
 
-assign text_bit_on =  (y[9:4] == 0)? font_bit : 1'b0;
+assign text_bit_on =  (y[9:8] == 0)? font_bit : 1'b0;
 
  // rgb multiplexing circuit
  always@(*)

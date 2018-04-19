@@ -12,9 +12,9 @@ wire clk_25;
 
 pll p(.inclk0(MAX10_CLK1_50), .c0(clk_25));
 
-reg [15:0] numbers;
+reg [383:0] numbers;
 
-always@* numbers <= 16'h1904;
+always@* numbers <= 384'h190419041904190419041904190419041904190419041904190419041904190419041904190419041904190419041904;
 
 picture_generator p_g(//.reset(KEY),
 							 .numbers(numbers),
