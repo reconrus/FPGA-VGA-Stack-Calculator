@@ -46,8 +46,8 @@ assign font_bit = font_word[~bit_addr];
 
 always@(*)
 begin
-if(x < maxInput * 2)
-case(numbers[(x/8)*4 +:4])
+if(x + 1 < maxInput * 2)
+case(numbers[((x+1)/8)*4 +:4])
 
 	4'h0: char_addr <= 6'h30;
 	4'h1: char_addr <= 6'h31;
@@ -73,9 +73,9 @@ assign text_bit_on =  (y[9:4] == 0)? font_bit : 1'b0;
      rgb_data = 12'h000; // blank
    else
      if (text_bit_on)
-        rgb_data = 12'hfff;  // white
+        rgb_data = 12'h000;  // white
      else
-        rgb_data = 12'h000;  // black
+        rgb_data = 12'hfff;  // black
 
 
 assign vga_R=rgb_data[11:8];

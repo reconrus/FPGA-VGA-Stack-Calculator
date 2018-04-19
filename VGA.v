@@ -12,7 +12,12 @@ wire clk_25;
 
 pll p(.inclk0(MAX10_CLK1_50), .c0(clk_25));
 
+reg [15:0] numbers;
+
+always@* numbers <= 16'h1904;
+
 picture_generator p_g(//.reset(KEY),
+							 .numbers(numbers),
 							 .clk(clk_25),
 							 .vga_h_sync(VGA_HS), 
 							 .vga_v_sync(VGA_VS), 
