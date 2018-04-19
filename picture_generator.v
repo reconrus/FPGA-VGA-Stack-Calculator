@@ -59,6 +59,11 @@ case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
 	4'h7: char_addr <= 6'h37;
 	4'h8: char_addr <= 6'h38;
 	4'h9: char_addr <= 6'h39;
+	4'ha: char_addr <= 6'h2b;
+	4'hb: char_addr <= 6'h2d;
+	4'hc: char_addr <= 6'h2a;
+	4'hd: char_addr <= 6'h2f;
+	4'he: char_addr <= 6'h3d;
 endcase
 
 else char_addr <= 6'h00;
