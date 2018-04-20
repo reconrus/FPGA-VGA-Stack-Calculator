@@ -1,13 +1,15 @@
 //http://www.fpga4fun.com/PongGame.html
 
 module picture_generator
-#(parameter maxInput = 384,
+#(parameter maxInput = 60,
   parameter VIDEO_W	= 640,
   parameter VIDEO_H	= 480)
-(clk, numbers, vga_h_sync, vga_v_sync, vga_R, vga_G, vga_B);
+(clk, numbers, image, vga_h_sync, vga_v_sync, vga_R, vga_G, vga_B);
 
 input clk;
-input [15:0] numbers;
+input [maxInput - 1:0] numbers;
+input image;
+
 
 output vga_h_sync, vga_v_sync;
 output [3:0] vga_R;
@@ -44,54 +46,50 @@ assign rom_addr = {char_addr, row_addr};
 assign bit_addr = x[2:0];
 assign font_bit = font_word[~bit_addr];
 
-//always@(*)
-//begin
-//if((y/16)*640 + x < maxInput * 2)
-//case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
-//
-//	4'h0: char_addr <= 6'h30;
-//	4'h1: char_addr <= 6'h31;
-//	4'h2: char_addr <= 6'h32;
-//	4'h3: char_addr <= 6'h33;
-//	4'h4: char_addr <= 6'h34;
-//	4'h5: char_addr <= 6'h35;
-//	4'h6: char_addr <= 6'h36;
-//	4'h7: char_addr <= 6'h37;
-//	4'h8: char_addr <= 6'h38;
-//	4'h9: char_addr <= 6'h39;
-//	4'ha: char_addr <= 6'h2b;
-//	4'hb: char_addr <= 6'h2d;
-//	4'hc: char_addr <= 6'h2a;
-//	4'hd: char_addr <= 6'h2f;
-//	4'he: char_addr <= 6'h3d;
-//endcase
-//
-//else char_addr <= 6'h00;
-//
-//end
+always@(*)
+begin
+if((y/16)*640 + x + 1< maxInput * 2)
+case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
+
+	4'h0: char_addr <= 6'h30;
+	4'h1: char_addr <= 6'h31;
+	4'h2: char_addr <= 6'h32;
+	4'h3: char_addr <= 6'h33;
+	4'h4: char_addr <= 6'h34;
+	4'h5: char_addr <= 6'h35;
+	4'h6: char_addr <= 6'h36;
+	4'h7: char_addr <= 6'h37;
+	4'h8: char_addr <= 6'h38;
+	4'h9: char_addr <= 6'h39;
+	4'ha: char_addr <= 6'h2b;
+	4'hb: char_addr <= 6'h2d;
+	4'hc: char_addr <= 6'h2a;
+	4'hd: char_addr <= 6'h2f;
+	4'he: char_addr <= 6'h3d;
+endcase
+
+else char_addr <= 6'h00;
+
+end
 
 wire [479:0] rgb;
 
 image_rom im(.row(y/16), .rgb(rgb));
 
 
-always@*
+always@(*)
 begin 
 if (~in_display_area)
    rgb_data = 12'h000; // blank
-else rgb_data <= rgb[(x/16)*12 +: 12];
+else
+	if(image)
+		rgb_data <= rgb[(x/16)*12 +: 12];
+	else
+    if (font_bit)
+       rgb_data = 12'h000;  // black
+    else
+       rgb_data = 12'hfff;  // white
 end
-
-
-//// rgb multiplexing circuit
-//always@(*)
-//  if (~in_display_area)
-//    rgb_data = 12'h000; // blank
-//  else
-//    if (font_bit)
-//       rgb_data = 12'h000;  // white
-//    else
-//       rgb_data = 12'hfff;  // black
 
 
 assign vga_R=rgb_data[11:8];

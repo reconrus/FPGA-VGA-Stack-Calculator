@@ -1,7 +1,8 @@
 
-module VGA(MAX10_CLK1_50, VGA_HS, VGA_VS, VGA_R, VGA_G, VGA_B);
+module VGA(MAX10_CLK1_50, image, VGA_HS, VGA_VS, VGA_R, VGA_G, VGA_B);
 
 input MAX10_CLK1_50;
+input image;
 output VGA_HS;
 output VGA_VS;
 output [3:0] VGA_R;
@@ -12,12 +13,13 @@ wire clk_25;
 
 pll p(.inclk0(MAX10_CLK1_50), .c0(clk_25));
 
-reg [383:0] numbers;
+reg [59:0] numbers;
 
-always@* numbers <= 384'h190419041904190419041904190419041904190419041904190419041904190419041904190419041904190419041904;
+always@* numbers <= {4'he, 4'hd, 4'hc, 4'hb, 4'ha, 4'h9, 4'h8, 4'h7, 4'h6, 4'h5, 4'h4, 4'h3, 4'h2, 4'h1, 4'h0};//384'h190419041904190419041904190419041904190419041904190419041904190419041904190419041904190419041904;
 
 picture_generator p_g(//.reset(KEY),
 							 .numbers(numbers),
+							 .image(image),
 							 .clk(clk_25),
 							 .vga_h_sync(VGA_HS), 
 							 .vga_v_sync(VGA_VS), 
