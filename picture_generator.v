@@ -31,7 +31,7 @@ wire [10:0] rom_addr;
 wire [3:0] row_addr;
 wire [2:0] bit_addr;
 wire [7:0] font_word;
-wire font_bit, text_bit_on;
+wire font_bit;
 
 // body
 // instantiate font ROM
@@ -44,43 +44,54 @@ assign rom_addr = {char_addr, row_addr};
 assign bit_addr = x[2:0];
 assign font_bit = font_word[~bit_addr];
 
-always@(*)
-begin
-if((y/16)*640 + x < maxInput * 2)
-case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
+//always@(*)
+//begin
+//if((y/16)*640 + x < maxInput * 2)
+//case(numbers[(y/16*80) + ((x+1)/8)*4 +:4])
+//
+//	4'h0: char_addr <= 6'h30;
+//	4'h1: char_addr <= 6'h31;
+//	4'h2: char_addr <= 6'h32;
+//	4'h3: char_addr <= 6'h33;
+//	4'h4: char_addr <= 6'h34;
+//	4'h5: char_addr <= 6'h35;
+//	4'h6: char_addr <= 6'h36;
+//	4'h7: char_addr <= 6'h37;
+//	4'h8: char_addr <= 6'h38;
+//	4'h9: char_addr <= 6'h39;
+//	4'ha: char_addr <= 6'h2b;
+//	4'hb: char_addr <= 6'h2d;
+//	4'hc: char_addr <= 6'h2a;
+//	4'hd: char_addr <= 6'h2f;
+//	4'he: char_addr <= 6'h3d;
+//endcase
+//
+//else char_addr <= 6'h00;
+//
+//end
 
-	4'h0: char_addr <= 6'h30;
-	4'h1: char_addr <= 6'h31;
-	4'h2: char_addr <= 6'h32;
-	4'h3: char_addr <= 6'h33;
-	4'h4: char_addr <= 6'h34;
-	4'h5: char_addr <= 6'h35;
-	4'h6: char_addr <= 6'h36;
-	4'h7: char_addr <= 6'h37;
-	4'h8: char_addr <= 6'h38;
-	4'h9: char_addr <= 6'h39;
-	4'ha: char_addr <= 6'h2b;
-	4'hb: char_addr <= 6'h2d;
-	4'hc: char_addr <= 6'h2a;
-	4'hd: char_addr <= 6'h2f;
-	4'he: char_addr <= 6'h3d;
-endcase
+wire [479:0] rgb;
 
-else char_addr <= 6'h00;
+image_rom im(.row(y/16), .rgb(rgb));
 
+
+always@*
+begin 
+if (~in_display_area)
+   rgb_data = 12'h000; // blank
+else rgb_data <= rgb[(x/16)*12 +: 12];
 end
 
-assign text_bit_on =  (y[9:8] == 0)? font_bit : 1'b0;
 
- // rgb multiplexing circuit
- always@(*)
-   if (~in_display_area)
-     rgb_data = 12'h000; // blank
-   else
-     if (text_bit_on)
-        rgb_data = 12'h000;  // white
-     else
-        rgb_data = 12'hfff;  // black
+//// rgb multiplexing circuit
+//always@(*)
+//  if (~in_display_area)
+//    rgb_data = 12'h000; // blank
+//  else
+//    if (font_bit)
+//       rgb_data = 12'h000;  // white
+//    else
+//       rgb_data = 12'hfff;  // black
 
 
 assign vga_R=rgb_data[11:8];
