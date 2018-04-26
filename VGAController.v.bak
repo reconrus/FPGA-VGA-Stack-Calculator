@@ -1,6 +1,6 @@
 //http://www.fpga4fun.com/PongGame.html
 
-module picture_generator
+module VGAController
 #(parameter maxInput = 60,
   parameter VIDEO_W	= 640,
   parameter VIDEO_H	= 480)
